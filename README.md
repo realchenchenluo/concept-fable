@@ -4,6 +4,12 @@
 
 > 想了解"当初为什么是这么做的"——需求演进、每一步的产出、踩过的坑（包括那些只有真机跑起来才暴露的），见 [对话纪要.md](对话纪要.md)。
 
+## 在线版
+
+**https://realchenchenluo.github.io/concept-fable/** —— 部署在 GitHub Pages 上，手机、电脑都能直接打开。
+
+手机浏览器里用「添加到主屏幕」，就能像 App 一样全屏使用（带 PWA 清单和图标，主题色跟着页面日夜走）。仓库只放网页部分：https://github.com/realchenchenluo/concept-fable
+
 ## 打开方式
 
 直接双击 `index.html`。零依赖、无网络请求，`file://` 下正常工作（只用普通 `<script src>`，没有 ES module、没有 fetch）。
@@ -36,7 +42,7 @@ node _standalone.js      # 生成 standalone.html（约 187 KB，全部内容内
 
 `standalone.html` 是一个自包含文件：发给微信「文件传输助手」，手机上点开就能读，不依赖任何服务器。安卓上如果浏览器能打开本地文件，也可以直接用文件管理器打开。
 
-想要桌面图标和全屏体验，需要把它放到一个 https 地址上（任意静态托管，把这几个文件传上去即可），然后在 Chrome 里「添加到主屏幕」。这一条还没做 manifest 和图标，需要的话再说。
+想要桌面图标和全屏体验：打开上面的在线版，在 Chrome 里「添加到主屏幕」即可——`manifest.webmanifest` 和图标（`icon-*.png`，与安卓版同一套设计，由 `make_icons.py` 生成）已经带上。
 
 ## 「每次不一样」是怎么做到的
 
@@ -55,6 +61,7 @@ concepts/_validate.js   校验器
 concepts/_render.js     把故事或教学层填好槽位打印出来，肉眼校句子
 _wire.js                重建 index.html 的外链（加了新模块就跑一下）
 _standalone.js          把整个站点内联成一个 standalone.html（手机上用 / 打包 APK 用）
+manifest.webmanifest    PWA 清单；图标 icon-*.png / favicon.ico 由 make_icons.py 生成（在线版"添加到主屏幕"用）
 ```
 
 ## 加一个概念 / 加一则故事
