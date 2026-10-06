@@ -1,0 +1,14 @@
+# 打包与移动端工程（网页版不需要；签名密钥不应公开）
+android/
+apk/
+node_modules/
+
+# Python 缓存
+__pycache__/
+*.pyc
+
+# 系统杂项
+.DS_Store
+Thumbs.db
+desktop.ini
+nul

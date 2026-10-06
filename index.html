@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark light">
+<title>概念寓言机 · 猜一个概念</title>
+<meta name="description" content="每次打开都是一个新的寓言故事。它一直在讲某个概念，但不会一开始就告诉你。">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#191715">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="寓言机">
+<script>/* 主题在首次绘制前就定下来，避免闪一下。
+   优先级：壳通过 #theme= 告知的（APP 里最可靠） → 浏览器里存过的 → 系统日夜。
+   注意引擎存的是 JSON，所以这里要先 parse 再比对。 */(function(){try{
+var t=null,h=location.hash||"",m=/theme=(day|night)/.exec(h);
+if(m)t=m[1];
+if(!t){var raw=localStorage.getItem("cf:theme");try{raw=JSON.parse(raw);}catch(e){}if(raw==="day"||raw==="night")t=raw;}
+if(!t){
+  if(/sys=day/.test(h))t="day";
+  else if(/sys=night/.test(h))t="night";
+  else t=(window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches)?"night":"day";
+}
+document.documentElement.setAttribute("data-theme",t);
+}catch(e){document.documentElement.setAttribute("data-theme","day");}})();</script>
+<script>/* theme-color 只能由 meta 决定，CSS 里的变量传不出去，所以跟着 data-theme 手动同步：
+   手机浏览器地址栏 / 添加到主屏幕后的状态栏颜色才不会和页面打架。 */(function(){
+var m=document.querySelector('meta[name="theme-color"]');
+if(!m)return;
+var map={day:"#e9e4d6",night:"#191715"};
+function sync(){m.setAttribute("content",map[document.documentElement.getAttribute("data-theme")]||map.night);}
+sync();
+new MutationObserver(sync).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+})();</script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="bar">
+  <div class="row">
+    <div class="k" id="kleft">概念寓言机</div>
+    <div class="k right">
+      <span class="cnt"><b id="scount">3</b> 处停顿</span>
+      <button class="tool" id="fontbtn" type="button"><span class="pfx">字·</span><span id="fslabel">中</span></button>
+      <button class="tool ghost" id="themebtn" type="button">日间</button>
+      <button class="tool" id="shuffle" type="button">换一个故事</button>
+    </div>
+  </div>
+  <div id="progwrap"><div id="prog"></div></div>
+</div>
+
+<div class="wrap" id="stage"></div>
+<div id="actionbar"><button id="actionbtn" type="button"><span>继续</span><span class="arw">→</span></button></div>
+<footer id="foot" style="display:none">故事、题目与讲解都来自 <code>concepts/</code> 下的概念模块：加一个模块就多一个概念，加一则故事就多一个世界。<br>静态页面，无依赖，无网络请求；读到哪里、答过哪几题都记在本地浏览器里。</footer>
+
+<!-- SCRIPTS:BEGIN -->
+<script src="concepts/information-entropy.js"></script>
+<script src="concepts/mean-reversion.js"></script>
+<script src="concepts/survivorship-bias.js"></script>
+<script src="concepts/symmetry-breaking.js"></script>
+<script src="engine.js"></script>
+<!-- SCRIPTS:END -->
+</body>
+</html>
