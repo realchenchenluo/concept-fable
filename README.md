@@ -8,7 +8,9 @@
 
 **https://realchenchenluo.github.io/concept-fable/** —— 部署在 GitHub Pages 上，手机、电脑都能直接打开。
 
-手机浏览器里用「添加到主屏幕」，就能像 App 一样全屏使用（带 PWA 清单和图标，主题色跟着页面日夜走）。仓库只放网页部分：https://github.com/realchenchenluo/concept-fable
+手机浏览器里用「添加到主屏幕」，就能像 App 一样全屏使用（带 PWA 清单和图标，主题色跟着页面日夜走）。**首次打开之后断网也能读**：外壳由 `sw.js` 缓存下来，而页面本身零网络请求。右上角的「↗ 分享」在手机上唤起系统分享面板，在电脑上复制链接（分享卡片由 `og-cover.png` 决定，发到微信/推特里是一张陶红的纸卡）。仓库只放网页部分：https://github.com/realchenchenluo/concept-fable
+
+> 改了内容想让老读者也马上看到，把 `sw.js` 顶上的 `VERSION` 加一（`v1` → `v2`）：新版本安装时会重抓一遍，旧的缓存在激活时删掉。
 
 ## 打开方式
 
@@ -30,19 +32,19 @@ python -m http.server 8770 --bind 127.0.0.1
 2. **进度记忆** —— `localStorage` 记住当前读到哪一则、第几幕、哪几题答过。中途退出再回来会**接着上次那一幕**读；之前答过的题只作展示（点错的选项划着），没答完的题还能接着答。读完则自动清掉续读点。
 3. **拇指操作** —— 手机上「继续」是底部固定条（`#actionbar`）；正在答题时它会自动收起，逼你看完题。桌面端仍然是正文下方那个按钮。
 4. **字号三档 + 日夜两套配色** —— 右上角切换，都记在本地。配色按长时间阅读调过：不用纯白纸配纯黑字，对比压低一档；夜里是暖灰深色（不是纯黑），纸纹只在日间显示。第一次打开跟随系统，之后按你上次的选择。
-5. **抽签历史** —— 优先抽**没读过**的那几则，全读完才按最久没读的轮换；封面显示「已读 N / 8 则」。
+5. **抽签历史** —— 优先抽**没读过**的那几则，全读完才按最久没读的轮换；封面显示「已读 N / 10 则」。
 
 安卓返回键 / 浏览器后退已经接上：回到上一幕，回到封面再按才退出（`history.pushState`，不支持的环境会自动跳过）。
 
 ### 放到手机上
 
 ```bash
-node _standalone.js      # 生成 standalone.html（约 187 KB，全部内容内联）
+node _standalone.js      # 生成 standalone.html（约 225 KB，全部内容内联）
 ```
 
 `standalone.html` 是一个自包含文件：发给微信「文件传输助手」，手机上点开就能读，不依赖任何服务器。安卓上如果浏览器能打开本地文件，也可以直接用文件管理器打开。
 
-想要桌面图标和全屏体验：打开上面的在线版，在 Chrome 里「添加到主屏幕」即可——`manifest.webmanifest` 和图标（`icon-*.png`，与安卓版同一套设计，由 `make_icons.py` 生成）已经带上。
+想要桌面图标和全屏体验：打开上面的在线版，在 Chrome 里「添加到主屏幕」即可——`manifest.webmanifest` 和图标（`icon-*.png`，与安卓版同一套设计，由 `make_icons.py` 生成）已经带上；`sw.js` 负责离线，所以装到主屏幕之后断网也能读。
 
 ## 「每次不一样」是怎么做到的
 
@@ -57,11 +59,14 @@ concepts/*.js     内容。一个文件 = 一个概念，每则故事 11~13 幕
   survivorship-bias.js     幸存者偏差（本科 · 统计）《补》《榜》
   symmetry-breaking.js     自发对称破缺（研究生 · 物理）《七度》《铁在夜里凉下来》
   information-entropy.js   信息熵（研究生 · 信息论）《灯语》《七问》
+  overfitting.js           过拟合（研究生 · 统计）《谱》《方》
 concepts/_validate.js   校验器
 concepts/_render.js     把故事或教学层填好槽位打印出来，肉眼校句子
 _wire.js                重建 index.html 的外链（加了新模块就跑一下）
 _standalone.js          把整个站点内联成一个 standalone.html（手机上用 / 打包 APK 用）
 manifest.webmanifest    PWA 清单；图标 icon-*.png / favicon.ico 由 make_icons.py 生成（在线版"添加到主屏幕"用）
+sw.js                   service worker：把外壳缓存下来，断网也能读（改了内容记得把 VERSION 加一）
+og-cover.png            分享卡片（og:image，1200×630，make_icons.py 生成）
 ```
 
 ## 加一个概念 / 加一则故事
@@ -100,7 +105,7 @@ node _wire.js                         # 加了新模块才需要，重建 index.
 
 ## APK（已经打好了）
 
-产物：`android/out/concept-fable.apk`，**81 KB，零权限**，minSdk 26（Android 8.0 及以上），targetSdk 34。
+产物：`android/out/concept-fable.apk`，**93 KB，零权限**，minSdk 26（Android 8.0 及以上），targetSdk 34。里面是当前网页（5 个概念、10 则故事、11~13 幕/则）。
 
 **装到手机上**：把 apk 传过去（微信文件传输助手、数据线、网盘都行），点开安装，第一次要允许「安装未知应用」。或者用数据线：
 
@@ -123,6 +128,8 @@ python android/build.py      # 编译 APK 到 android/out/
 ```
 
 构建脚本不用 Gradle：直接调 SDK 里的 `aapt2`（编译资源、链接清单与 assets）、`javac`（编译 Activity）、`d8`（转 dex）、`zipalign`、`apksigner`，全部离线可跑。JDK 用机器上已有的（默认取 WebStorm 自带的 JBR 21，可用 `JBR_HOME` 覆盖），SDK 路径可用 `ANDROID_SDK` 覆盖。
+
+**路径含中文时会自动绕路**：`aapt2` 打不开非 ASCII 路径（实测 build-tools 35.0.0 报 `failed to open directory`，与盘符无关）。所以工程放在中文目录（比如 `寓言故事/`）里时，`build.py` 会先把 android 工程镜像到临时目录、在那儿打包，再把 APK 搬回来——镜像里带着 keystore，签名不变，覆盖安装照旧。你只会看到多一行提示。
 
 **签名**：自签的本地密钥（`android/keystore/debug.keystore`，口令都是 `android`）。自用足够；以后要用新版覆盖安装，必须用同一个 keystore 签。
 

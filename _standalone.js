@@ -36,10 +36,14 @@ if (missing.length) {
   process.exit(1);
 }
 
-// 兜底：即使将来加了别的引用，也提醒一下
-const leftover = html.match(/(?:src|href)="(?!data:|#)([^"]+)"/g);
+// 兜底：即使将来加了别的引用，也提醒一下。
+// 例外：manifest 与图标是 PWA 元信息，单文件版（file:// 打开）不需要它们，
+// 留在 <head> 里无害，所以不算「残留引用」。
+const leftover = (html.match(/<(?:script|link)\b[^>]*(?:src|href)="(?!data:|#)[^"]+"[^>]*>/g) || [])
+  .filter(tag => !/rel="(?:manifest|icon|apple-touch-icon|mask-icon)"/.test(tag))
+  .map(tag => tag.match(/(?:src|href)="([^"]+)"/)[1]);
 const out = path.join(root, "standalone.html");
 fs.writeFileSync(out, html, "utf8");
 const kb = (fs.statSync(out).size / 1024).toFixed(0);
 console.log("已生成 standalone.html：" + n + " 个脚本已内联，共 " + kb + " KB");
-if (leftover) console.log("仍存在外部引用（请检查）：" + leftover.join(" "));
+if (leftover.length) console.log("仍存在外部引用（请检查）：" + leftover.join(" "));
